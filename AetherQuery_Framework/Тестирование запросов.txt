@@ -1,0 +1,20 @@
+# Проверяем корневой эндпоинт
+curl http://localhost:8080/
+
+# Проверяем здоровье
+curl http://localhost:8080/health
+
+# Тестируем запросы
+curl "http://localhost:8080/query?q=SELECT * FROM users"
+
+# Примеры запросов
+curl http://localhost:8080/query/examples
+
+# Список клиентов
+curl http://localhost:8080/clients
+
+# Собираем сервер
+go build -o aether_query cmd/server/main.go
+
+# Запускаем для теста
+./aether_query
