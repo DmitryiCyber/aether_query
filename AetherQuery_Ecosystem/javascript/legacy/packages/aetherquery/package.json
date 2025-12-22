@@ -1,0 +1,25 @@
+{
+  "name": "aetherquery",
+  "version": "1.0.0",
+  "description": "JavaScript/TypeScript client for AetherQuery",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "keywords": ["sql", "database", "query", "aetherquery"],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.13.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.2.0",
+    "rollup": "^4.53.3",
+    "typescript": "^5.9.3"
+  }
+}

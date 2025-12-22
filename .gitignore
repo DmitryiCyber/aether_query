@@ -1,0 +1,73 @@
+# В корне проекта
+cat > .gitignore << 'EOF'
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Rust
+target/
+**/*.rs.bk
+
+# C#/.NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.vs/
+.vs/
+*.swp
+*.swo
+
+# Go
+vendor/
+*.exe
+*.test
+*.out
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Временные файлы
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Бинарники (кроме тех, что нужны)
+*.exe
+*.dll
+*.so
+*.dylib
+*.wasm
+*.a
+
+# Исключения (оставляем нужные бинарники)
+!AetherQuery_Ecosystem/goja-client/aetherquery
+!AetherQuery_Ecosystem/go_server/aether_query*
+EOF

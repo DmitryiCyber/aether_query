@@ -1,0 +1,111 @@
+[project]
+name = "aetherquery-framework"
+version = "0.1.0"
+description = "Multi-language database framework with AI integration"
+authors = [
+    {name = "AetherQuery Team", email = "team@aetherquery.com"},
+]
+readme = "README.md"
+requires-python = ">=3.13.8"
+license = {text = "MIT"}
+
+dependencies = [
+    # 🔧 Core dependencies
+    "pydantic",
+    "pydantic-settings", 
+    "typing-extensions",
+    
+    # 🗃️ Database adapters
+    "psycopg2-binary",
+    "mysql-connector-python",
+    # SQLite is built-in
+    
+    # 🔌 Additional databases
+    "pymongo",
+    "redis",
+    
+    # 📊 Utilities
+    "python-dotenv",
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+dev = [
+    # 🧪 Testing
+    "pytest",
+    "pytest-asyncio", 
+    "pytest-cov",
+    "testcontainers",
+    
+    # 📝 Documentation
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings-python",
+    
+    # 🔍 Code quality
+    "black",
+    "flake8",
+    "mypy",
+    "pre-commit",
+    "ruff",
+]
+
+cli = [
+    "click",
+    "rich",
+]
+
+api = [
+    "fastapi",
+    "uvicorn[standard]",
+]
+
+all = [
+    "aetherquery-framework[dev]",
+    "aetherquery-framework[cli]", 
+    "aetherquery-framework[api]",
+]
+
+[project.urls]
+Homepage = "https://github.com/aetherquery/aetherquery-framework"
+Documentation = "https://aetherquery-framework.readthedocs.io"
+Repository = "https://github.com/aetherquery/aetherquery-framework"
+"Bug Reports" = "https://github.com/aetherquery/aetherquery-framework/issues"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+# 🔧 Development tools
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["aetherquery*"]
+
+[tool.setuptools.package-dir]
+aetherquery = "src/aetherquery"
+
+[tool.black]
+line-length = 100
+target-version = ['py313']
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+select = [
+    "E", "W", "F", "I", "B", "C4", "UP",
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.mypy]
+python_version = "3.13.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "--verbose --strict-markers --strict-config"
+asyncio_mode = "auto"

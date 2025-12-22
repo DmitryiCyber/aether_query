@@ -1,0 +1,10 @@
+{
+  "error": "QUERY_ERROR",
+  "code": "SYNTAX_ERROR", 
+  "message": "SQL syntax error near 'FROm'",
+  "details": {
+    "position": 15,
+    "suggestion": "Did you mean 'FROM'?"
+  },
+  "timestamp": "2024-01-15T10:30:00Z"
+}

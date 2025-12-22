@@ -1,0 +1,115 @@
+# AetherQuery_Ecosystem/api_spec/openapi.yaml
+openapi: 3.0.0
+info:
+  title: AetherQuery API
+  version: 1.0.0
+  description: Unified SQL Query Interface for Multiple Languages
+  contact:
+    name: AetherQuery Team
+    url: https://github.com/aetherquery/aether_query
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Development server
+  - url: https://api.aetherquery.com/v1
+    description: Production server
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      description: Check if the server is running
+      responses:
+        '200':
+          description: Server is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  
+  /query:
+    post:
+      summary: Execute SQL query
+      description: Execute a SQL query and return results
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryRequest'
+      responses:
+        '200':
+          description: Query executed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResponse'
+        '400':
+          description: Bad request - invalid query or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /batch:
+    post:
+      summary: Execute batch queries
+      description: Execute multiple SQL queries in a single transaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchRequest'
+      responses:
+        '200':
+          description: Batch executed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchResponse'
+
+components:
+  schemas:
+    # Базовые схемы будут в следующих файлах
+    HealthResponse:
+      $ref: './types/common_types.yaml#/HealthResponse'
+    
+    QueryRequest:
+      $ref: './types/query_request.yaml#/QueryRequest'
+    
+    QueryResponse:
+      $ref: './types/query_response.yaml#/QueryResponse'
+    
+    BatchRequest:
+      $ref: './types/query_request.yaml#/BatchRequest'
+    
+    BatchResponse:
+      $ref: './types/query_response.yaml#/BatchResponse'
+    
+    ErrorResponse:
+      $ref: './types/common_types.yaml#/ErrorResponse'
+
+  parameters:
+    # Общие параметры
+    ContentType:
+      name: Content-Type
+      in: header
+      required: true
+      schema:
+        type: string
+        enum: [application/json]
+      example: application/json
+
+  responses:
+    # Общие ответы
+    Unauthorized:
+      description: Unauthorized access
+    NotFound:
+      description: Resource not found

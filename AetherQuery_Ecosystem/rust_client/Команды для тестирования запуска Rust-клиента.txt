@@ -1,0 +1,29 @@
+# Показать справку
+cargo run -- --help
+
+# Проверить статус сервера
+cargo run -- status
+
+# С verbose режимом
+cargo run -- --verbose status
+
+# С другим форматом вывода
+cargo run -- --format json status
+cargo run -- --format csv status
+
+# Выполнить запрос
+cargo run -- query "SHOW TABLES"
+cargo run -- --format json query "SELECT * FROM users"
+
+# Сохранить результаты в файл
+cargo run -- query "SELECT 1" --output test.txt
+
+# Список таблиц
+cargo run -- tables
+cargo run -- tables user%
+
+# Описание таблицы
+cargo run -- describe users
+
+# Интерактивный режим
+cargo run -- shell

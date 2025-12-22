@@ -1,0 +1,56 @@
+# AetherQuery_Ecosystem/api_spec/types/query_request.yaml
+QueryRequest:
+  type: object
+  required:
+    - query
+  properties:
+    query:
+      type: string
+      description: SQL query to execute
+      example: "SELECT * FROM users WHERE age > ?"
+    params:
+      type: array
+      description: Query parameters for prepared statements
+      items:
+        oneOf:
+          - type: string
+          - type: integer
+          - type: number
+          - type: boolean
+          - type: null
+      example: [25]
+    options:
+      type: object
+      description: Additional execution options
+      properties:
+        timeout:
+          type: integer
+          description: Query timeout in milliseconds
+          example: 5000
+        read_only:
+          type: boolean
+          description: Whether the query is read-only
+          example: true
+        transaction:
+          type: boolean
+          description: Whether to run in transaction
+          example: false
+
+BatchRequest:
+  type: object
+  required:
+    - queries
+  properties:
+    queries:
+      type: array
+      items:
+        $ref: '#/QueryRequest'
+      example:
+        - query: "INSERT INTO users (name, email) VALUES (?, ?)"
+          params: ["John", "john@example.com"]
+        - query: "SELECT * FROM users WHERE name = ?"
+          params: ["John"]
+    transaction:
+      type: boolean
+      description: Whether to execute in single transaction
+      example: true

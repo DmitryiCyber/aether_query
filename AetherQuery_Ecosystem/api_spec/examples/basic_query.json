@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, name, email FROM users WHERE active = ?",
+  "params": [true],
+  "options": {
+    "timeout": 5000,
+    "read_only": true
+  }
+}

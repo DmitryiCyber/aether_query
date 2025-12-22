@@ -1,0 +1,1 @@
+{"method":"GET","query":"SELECT 1","result":"Executed SELECT query: 'SELECT 1'","rows":2,"success":true}

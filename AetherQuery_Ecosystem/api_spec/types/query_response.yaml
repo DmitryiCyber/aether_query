@@ -1,0 +1,45 @@
+# AetherQuery_Ecosystem/api_spec/types/query_response.yaml
+QueryResponse:
+  type: object
+  required:
+    - success
+    - query
+  properties:
+    success:
+      type: boolean
+      example: true
+    query:
+      type: string
+      example: "SELECT * FROM users"
+    result:
+      $ref: '../types/common_types.yaml#/QueryResult'
+    execution_time:
+      type: number
+      format: float
+      example: 0.045
+    affected_rows:
+      type: integer
+      description: Number of affected rows for INSERT/UPDATE/DELETE
+      example: 1
+    last_insert_id:
+      type: integer
+      description: Last inserted ID for INSERT queries
+      example: 42
+
+BatchResponse:
+  type: object
+  required:
+    - success
+    - results
+  properties:
+    success:
+      type: boolean
+      example: true
+    results:
+      type: array
+      items:
+        $ref: '#/QueryResponse'
+    total_execution_time:
+      type: number
+      format: float
+      example: 0.089

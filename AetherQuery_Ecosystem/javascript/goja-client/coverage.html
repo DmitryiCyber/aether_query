@@ -1,0 +1,810 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>core: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/aetherquery/goja-client/internal/core/client.go (38.3%)</option>
+				
+				<option value="file1">github.com/aetherquery/goja-client/internal/core/errors.go (39.1%)</option>
+				
+				<option value="file2">github.com/aetherquery/goja-client/internal/core/http.go (7.5%)</option>
+				
+				<option value="file3">github.com/aetherquery/goja-client/internal/core/models.go (37.5%)</option>
+				
+				<option value="file4">github.com/aetherquery/goja-client/internal/core/utils.go (25.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">no coverage</span>
+				<span class="cov1">low coverage</span>
+				<span class="cov2">*</span>
+				<span class="cov3">*</span>
+				<span class="cov4">*</span>
+				<span class="cov5">*</span>
+				<span class="cov6">*</span>
+				<span class="cov7">*</span>
+				<span class="cov8">*</span>
+				<span class="cov9">*</span>
+				<span class="cov10">high coverage</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package core
+
+import (
+        "encoding/json"
+        "fmt"
+        "time"
+)
+
+// AetherClient - основной клиент для работы с AetherQuery
+type AetherClient struct {
+        baseURL    string
+        httpClient *HTTPClient
+        options    ClientOptions
+}
+
+// ClientOptions - опции клиента
+type ClientOptions struct {
+        APIKey     string
+        SQLKey     string
+        Timeout    time.Duration
+        MaxRetries int
+        RetryDelay time.Duration
+        Headers    map[string]string
+}
+
+// NewClient создает новый экземпляр клиента
+func NewClient(baseURL string, options ...ClientOption) *AetherClient <span class="cov8" title="3">{
+        opts := ClientOptions{
+                Timeout:    30 * time.Second,
+                MaxRetries: 3,
+                RetryDelay: 1 * time.Second,
+                Headers:    make(map[string]string),
+        }
+
+        // Применяем переданные опции
+        for _, option := range options </span><span class="cov10" title="4">{
+                option(&amp;opts)
+        }</span>
+
+        <span class="cov8" title="3">httpClient := NewHTTPClient(HTTPOptions{
+                BaseURL:    baseURL,
+                Timeout:    opts.Timeout,
+                MaxRetries: opts.MaxRetries,
+                RetryDelay: opts.RetryDelay,
+                Headers:    opts.Headers,
+        })
+
+        // Устанавливаем авторизацию
+        if opts.APIKey != "" </span><span class="cov1" title="1">{
+                httpClient.SetHeader("X-API-Key", opts.APIKey)
+        }</span>
+        <span class="cov8" title="3">if opts.SQLKey != "" </span><span class="cov1" title="1">{
+                httpClient.SetHeader("X-SQL-Key", opts.SQLKey)
+        }</span>
+
+        <span class="cov8" title="3">return &amp;AetherClient{
+                baseURL:    baseURL,
+                httpClient: httpClient,
+                options:    opts,
+        }</span>
+}
+
+// ClientOption - функциональная опция для конфигурации клиента
+type ClientOption func(*ClientOptions)
+
+func WithAPIKey(apiKey string) ClientOption <span class="cov1" title="1">{
+        return func(o *ClientOptions) </span><span class="cov1" title="1">{
+                o.APIKey = apiKey
+        }</span>
+}
+
+func WithSQLKey(sqlKey string) ClientOption <span class="cov1" title="1">{
+        return func(o *ClientOptions) </span><span class="cov1" title="1">{
+                o.SQLKey = sqlKey
+        }</span>
+}
+
+func WithTimeout(timeout time.Duration) ClientOption <span class="cov1" title="1">{
+        return func(o *ClientOptions) </span><span class="cov1" title="1">{
+                o.Timeout = timeout
+        }</span>
+}
+
+func WithMaxRetries(retries int) ClientOption <span class="cov1" title="1">{
+        return func(o *ClientOptions) </span><span class="cov1" title="1">{
+                o.MaxRetries = retries
+        }</span>
+}
+
+func WithHeader(key, value string) ClientOption <span class="cov0" title="0">{
+        return func(o *ClientOptions) </span><span class="cov0" title="0">{
+                if o.Headers == nil </span><span class="cov0" title="0">{
+                        o.Headers = make(map[string]string)
+                }</span>
+                <span class="cov0" title="0">o.Headers[key] = value</span>
+        }
+}
+
+// ExecuteQuery выполняет одиночный SQL запрос
+func (c *AetherClient) ExecuteQuery(query string, params []interface{}, options *QueryOptions) (*QueryResponse, error) <span class="cov0" title="0">{
+        request := QueryRequest{
+                Query:  query,
+                Params: params,
+                Options: options,
+        }
+
+        data, err := json.Marshal(request)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to marshal request: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">response, err := c.httpClient.Post("/query", data)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">var queryResponse QueryResponse
+        if err := json.Unmarshal(response, &amp;queryResponse); err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to unmarshal response: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">return &amp;queryResponse, nil</span>
+}
+
+// ExecuteBatch выполняет пакет запросов
+func (c *AetherClient) ExecuteBatch(queries []QueryRequest, transaction bool) (*BatchResponse, error) <span class="cov0" title="0">{
+        request := BatchRequest{
+                Queries:    queries,
+                Transaction: transaction,
+        }
+
+        data, err := json.Marshal(request)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to marshal request: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">response, err := c.httpClient.Post("/batch", data)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">var batchResponse BatchResponse
+        if err := json.Unmarshal(response, &amp;batchResponse); err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to unmarshal response: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">return &amp;batchResponse, nil</span>
+}
+
+// Health проверяет доступность сервера
+func (c *AetherClient) Health() (*HealthResponse, error) <span class="cov0" title="0">{
+        response, err := c.httpClient.Get("/health")
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">var healthResponse HealthResponse
+        if err := json.Unmarshal(response, &amp;healthResponse); err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to unmarshal response: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">return &amp;healthResponse, nil</span>
+}
+
+// SetBaseURL обновляет базовый URL
+func (c *AetherClient) SetBaseURL(baseURL string) <span class="cov0" title="0">{
+        c.baseURL = baseURL
+        c.httpClient.SetBaseURL(baseURL)
+}</span>
+
+// SetAuth устанавливает ключи авторизации
+func (c *AetherClient) SetAuth(apiKey, sqlKey string) <span class="cov1" title="1">{
+        c.options.APIKey = apiKey
+        c.options.SQLKey = sqlKey
+        
+        if apiKey != "" </span><span class="cov1" title="1">{
+                c.httpClient.SetHeader("X-API-Key", apiKey)
+        }</span> else<span class="cov0" title="0"> {
+                c.httpClient.RemoveHeader("X-API-Key")
+        }</span>
+        
+        <span class="cov1" title="1">if sqlKey != "" </span><span class="cov1" title="1">{
+                c.httpClient.SetHeader("X-SQL-Key", sqlKey)
+        }</span> else<span class="cov0" title="0"> {
+                c.httpClient.RemoveHeader("X-SQL-Key")
+        }</span>
+}</pre>
+		
+		<pre class="file" id="file1" style="display: none">package core
+
+import "fmt"
+
+// AetherError - базовая ошибка AetherQuery
+type AetherError struct {
+        Code     string      `json:"code"`
+        Message  string      `json:"message"`
+        Details  interface{} `json:"details,omitempty"`
+        HTTPCode int         `json:"http_code,omitempty"`
+}
+
+// Error реализует интерфейс error
+func (e *AetherError) Error() string <span class="cov0" title="0">{
+        if e.HTTPCode != 0 </span><span class="cov0" title="0">{
+                return fmt.Sprintf("[%s] HTTP %d: %s", e.Code, e.HTTPCode, e.Message)
+        }</span>
+        <span class="cov0" title="0">return fmt.Sprintf("[%s] %s", e.Code, e.Message)</span>
+}
+
+// Predefined errors
+var (
+        ErrConnectionFailed = &amp;AetherError{
+                Code:    "CONNECTION_FAILED",
+                Message: "Failed to connect to AetherQuery server",
+        }
+
+        ErrInvalidResponse = &amp;AetherError{
+                Code:    "INVALID_RESPONSE",
+                Message: "Invalid response from server",
+        }
+
+        ErrQueryExecution = &amp;AetherError{
+                Code:    "QUERY_EXECUTION_FAILED",
+                Message: "Query execution failed",
+        }
+
+        ErrAuthentication = &amp;AetherError{
+                Code:    "AUTHENTICATION_FAILED",
+                Message: "Authentication failed",
+        }
+
+        ErrValidation = &amp;AetherError{
+                Code:    "VALIDATION_ERROR",
+                Message: "Request validation failed",
+        }
+
+        ErrTimeout = &amp;AetherError{
+                Code:    "TIMEOUT",
+                Message: "Request timeout",
+        }
+)
+
+// ErrorMapper маппит HTTP коды в AetherError
+func ErrorMapper(statusCode int, message string, details interface{}) *AetherError <span class="cov10" title="6">{
+        switch statusCode </span>{
+        case 400:<span class="cov1" title="1">
+                return &amp;AetherError{
+                        Code:     "BAD_REQUEST",
+                        Message:  message,
+                        Details:  details,
+                        HTTPCode: statusCode,
+                }</span>
+        case 401:<span class="cov1" title="1">
+                return &amp;AetherError{
+                        Code:     "UNAUTHORIZED",
+                        Message:  message,
+                        Details:  details,
+                        HTTPCode: statusCode,
+                }</span>
+        case 403:<span class="cov1" title="1">
+                return &amp;AetherError{
+                        Code:     "FORBIDDEN",
+                        Message:  message,
+                        Details:  details,
+                        HTTPCode: statusCode,
+                }</span>
+        case 404:<span class="cov0" title="0">
+                return &amp;AetherError{
+                        Code:     "NOT_FOUND",
+                        Message:  message,
+                        Details:  details,
+                        HTTPCode: statusCode,
+                }</span>
+        case 422:<span class="cov1" title="1">
+                return &amp;AetherError{
+                        Code:     "VALIDATION_ERROR",
+                        Message:  message,
+                        Details:  details,
+                        HTTPCode: statusCode,
+                }</span>
+        case 429:<span class="cov0" title="0">
+                return &amp;AetherError{
+                        Code:     "RATE_LIMITED",
+                        Message:  message,
+                        Details:  details,
+                        HTTPCode: statusCode,
+                }</span>
+        case 500:<span class="cov1" title="1">
+                return &amp;AetherError{
+                        Code:     "SERVER_ERROR",
+                        Message:  message,
+                        Details:  details,
+                        HTTPCode: statusCode,
+                }</span>
+        case 502, 503, 504:<span class="cov0" title="0">
+                return &amp;AetherError{
+                        Code:     "SERVICE_UNAVAILABLE",
+                        Message:  message,
+                        Details:  details,
+                        HTTPCode: statusCode,
+                }</span>
+        default:<span class="cov1" title="1">
+                return &amp;AetherError{
+                        Code:     "UNKNOWN_ERROR",
+                        Message:  message,
+                        Details:  details,
+                        HTTPCode: statusCode,
+                }</span>
+        }
+}
+
+// IsConnectionError проверяет является ли ошибка ошибкой соединения
+func IsConnectionError(err error) bool <span class="cov6" title="3">{
+        if aetherErr, ok := err.(*AetherError); ok </span><span class="cov6" title="3">{
+                return aetherErr.Code == "NETWORK_ERROR" || 
+                       aetherErr.Code == "CONNECTION_FAILED" ||
+                       aetherErr.HTTPCode &gt;= 500
+        }</span>
+        <span class="cov0" title="0">return false</span>
+}
+
+// IsAuthenticationError проверяет является ли ошибка ошибкой аутентификации
+func IsAuthenticationError(err error) bool <span class="cov0" title="0">{
+        if aetherErr, ok := err.(*AetherError); ok </span><span class="cov0" title="0">{
+                return aetherErr.Code == "UNAUTHORIZED" || 
+                       aetherErr.Code == "FORBIDDEN" ||
+                       aetherErr.Code == "AUTHENTICATION_FAILED" ||
+                       aetherErr.HTTPCode == 401 ||
+                       aetherErr.HTTPCode == 403
+        }</span>
+        <span class="cov0" title="0">return false</span>
+}
+
+// IsValidationError проверяет является ли ошибка ошибкой валидации
+func IsValidationError(err error) bool <span class="cov0" title="0">{
+        if aetherErr, ok := err.(*AetherError); ok </span><span class="cov0" title="0">{
+                return aetherErr.Code == "VALIDATION_ERROR" || 
+                       aetherErr.Code == "BAD_REQUEST" ||
+                       aetherErr.HTTPCode == 400 ||
+                       aetherErr.HTTPCode == 422
+        }</span>
+        <span class="cov0" title="0">return false</span>
+}
+
+// WrapError оборачивает ошибку в AetherError
+func WrapError(err error, code, message string) *AetherError <span class="cov0" title="0">{
+        return &amp;AetherError{
+                Code:    code,
+                Message: fmt.Sprintf("%s: %v", message, err),
+        }
+}</pre>
+		
+		<pre class="file" id="file2" style="display: none">package core
+
+import (
+        "bytes"
+        "encoding/json"
+        "fmt"
+        "io"
+        "net/http"
+        "time"
+)
+
+// HTTPOptions - опции HTTP клиента
+type HTTPOptions struct {
+        BaseURL    string
+        Timeout    time.Duration
+        MaxRetries int
+        RetryDelay time.Duration
+        Headers    map[string]string
+}
+
+// HTTPClient - HTTP клиент с повторными попытками
+type HTTPClient struct {
+        client  *http.Client
+        options HTTPOptions
+        headers map[string]string
+}
+
+// NewHTTPClient создает новый HTTP клиент
+func NewHTTPClient(options HTTPOptions) *HTTPClient <span class="cov8" title="3">{
+        client := &amp;http.Client{
+                Timeout: options.Timeout,
+        }
+
+        return &amp;HTTPClient{
+                client: client,
+                options: options,
+                headers: make(map[string]string),
+        }
+}</span>
+
+// Post выполняет POST запрос
+func (h *HTTPClient) Post(endpoint string, data []byte) ([]byte, error) <span class="cov0" title="0">{
+        return h.request("POST", endpoint, data, h.options.MaxRetries)
+}</span>
+
+// Get выполняет GET запрос
+func (h *HTTPClient) Get(endpoint string) ([]byte, error) <span class="cov0" title="0">{
+        return h.request("GET", endpoint, nil, h.options.MaxRetries)
+}</span>
+
+// request выполняет HTTP запрос с повторными попытками
+func (h *HTTPClient) request(method, endpoint string, data []byte, retries int) ([]byte, error) <span class="cov0" title="0">{
+        url := h.options.BaseURL + endpoint
+
+        var body io.Reader
+        if data != nil </span><span class="cov0" title="0">{
+                body = bytes.NewReader(data)
+        }</span>
+
+        <span class="cov0" title="0">req, err := http.NewRequest(method, url, body)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, &amp;AetherError{
+                        Code:    "REQUEST_ERROR",
+                        Message: fmt.Sprintf("Failed to create request: %v", err),
+                }
+        }</span>
+
+        // Устанавливаем заголовки
+        <span class="cov0" title="0">req.Header.Set("Content-Type", "application/json")
+        req.Header.Set("User-Agent", "AetherQuery-Go-Client/1.0.0")
+        
+        for key, value := range h.headers </span><span class="cov0" title="0">{
+                req.Header.Set(key, value)
+        }</span>
+        <span class="cov0" title="0">for key, value := range h.options.Headers </span><span class="cov0" title="0">{
+                req.Header.Set(key, value)
+        }</span>
+
+        // Выполняем запрос
+        <span class="cov0" title="0">resp, err := h.client.Do(req)
+        if err != nil </span><span class="cov0" title="0">{
+                if retries &gt; 0 </span><span class="cov0" title="0">{
+                        time.Sleep(h.options.RetryDelay)
+                        return h.request(method, endpoint, data, retries-1)
+                }</span>
+                <span class="cov0" title="0">return nil, &amp;AetherError{
+                        Code:    "NETWORK_ERROR",
+                        Message: fmt.Sprintf("Network error: %v", err),
+                }</span>
+        }
+        <span class="cov0" title="0">defer resp.Body.Close()
+
+        // Читаем ответ
+        responseBody, err := io.ReadAll(resp.Body)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, &amp;AetherError{
+                        Code:    "READ_ERROR",
+                        Message: fmt.Sprintf("Failed to read response: %v", err),
+                }
+        }</span>
+
+        // Проверяем статус код
+        <span class="cov0" title="0">if resp.StatusCode &lt; 200 || resp.StatusCode &gt;= 300 </span><span class="cov0" title="0">{
+                // Пытаемся распарсить ошибку из ответа
+                var errorResp struct {
+                        Error *ErrorDetail `json:"error"`
+                }
+                if json.Unmarshal(responseBody, &amp;errorResp) == nil &amp;&amp; errorResp.Error != nil </span><span class="cov0" title="0">{
+                        return nil, &amp;AetherError{
+                                Code:     errorResp.Error.Code,
+                                Message:  errorResp.Error.Message,
+                                Details:  errorResp.Error.Details,
+                                HTTPCode: resp.StatusCode,
+                        }
+                }</span>
+
+                // Общая HTTP ошибка
+                <span class="cov0" title="0">if retries &gt; 0 &amp;&amp; shouldRetry(resp.StatusCode) </span><span class="cov0" title="0">{
+                        time.Sleep(h.options.RetryDelay)
+                        return h.request(method, endpoint, data, retries-1)
+                }</span>
+
+                <span class="cov0" title="0">return nil, &amp;AetherError{
+                        Code:     "HTTP_ERROR",
+                        Message:  fmt.Sprintf("HTTP %d: %s", resp.StatusCode, string(responseBody)),
+                        HTTPCode: resp.StatusCode,
+                }</span>
+        }
+
+        <span class="cov0" title="0">return responseBody, nil</span>
+}
+
+// shouldRetry определяет нужно ли повторять запрос для данного статус кода
+func shouldRetry(statusCode int) bool <span class="cov0" title="0">{
+        return statusCode == http.StatusRequestTimeout ||
+                statusCode == http.StatusTooManyRequests ||
+                statusCode &gt;= http.StatusInternalServerError
+}</span>
+
+// SetHeader устанавливает заголовок
+func (h *HTTPClient) SetHeader(key, value string) <span class="cov10" title="4">{
+        h.headers[key] = value
+}</span>
+
+// RemoveHeader удаляет заголовок
+func (h *HTTPClient) RemoveHeader(key string) <span class="cov0" title="0">{
+        delete(h.headers, key)
+}</span>
+
+// SetBaseURL обновляет базовый URL
+func (h *HTTPClient) SetBaseURL(baseURL string) <span class="cov0" title="0">{
+        h.options.BaseURL = baseURL
+}</pre>
+		
+		<pre class="file" id="file3" style="display: none">package core
+
+// QueryRequest - запрос на выполнение SQL
+type QueryRequest struct {
+        Query   string        `json:"query"`
+        Params  []interface{} `json:"params,omitempty"`
+        Options *QueryOptions `json:"options,omitempty"`
+}
+
+// QueryOptions - дополнительные опции запроса
+type QueryOptions struct {
+        Timeout  *float64 `json:"timeout,omitempty"`
+        ReadOnly *bool    `json:"read_only,omitempty"`
+        MaxRows  *int     `json:"max_rows,omitempty"`
+}
+
+// BatchRequest - запрос на выполнение пакета SQL запросов
+type BatchRequest struct {
+        Queries    []QueryRequest `json:"queries"`
+        Transaction bool          `json:"transaction"`
+}
+
+// QueryResult - результат выполнения запроса
+type QueryResult struct {
+        Columns       []string      `json:"columns"`
+        Rows          [][]interface{} `json:"rows"`
+        RowCount      int           `json:"row_count"`
+        ExecutionTime *float64      `json:"execution_time,omitempty"`
+}
+
+// QueryResponse - ответ на выполнение запроса
+type QueryResponse struct {
+        Success       bool         `json:"success"`
+        Query         string       `json:"query"`
+        Result        *QueryResult `json:"result,omitempty"`
+        ExecutionTime *float64     `json:"execution_time,omitempty"`
+        AffectedRows  *int         `json:"affected_rows,omitempty"`
+        LastInsertID  *int64       `json:"last_insert_id,omitempty"`
+        Error         *ErrorDetail `json:"error,omitempty"`
+}
+
+// BatchResponse - ответ на выполнение пакета запросов
+type BatchResponse struct {
+        Success           bool            `json:"success"`
+        Results           []QueryResponse `json:"results"`
+        TotalExecutionTime *float64       `json:"total_execution_time,omitempty"`
+}
+
+// HealthResponse - ответ проверки здоровья
+type HealthResponse struct {
+        Status    string  `json:"status"`
+        Timestamp string  `json:"timestamp"`
+        Version   *string `json:"version,omitempty"`
+        Database  *string `json:"database,omitempty"`
+}
+
+// ErrorDetail - детали ошибки
+type ErrorDetail struct {
+        Code    string      `json:"code"`
+        Message string      `json:"message"`
+        Details interface{} `json:"details,omitempty"`
+}
+
+// RowToMap конвертирует строку результата в map
+func (qr *QueryResult) RowToMap(rowIndex int) map[string]interface{} <span class="cov6" title="3">{
+        if rowIndex &lt; 0 || rowIndex &gt;= len(qr.Rows) </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+
+        <span class="cov6" title="3">result := make(map[string]interface{})
+        for colIndex, column := range qr.Columns </span><span class="cov10" title="6">{
+                result[column] = qr.Rows[rowIndex][colIndex]
+        }</span>
+        <span class="cov6" title="3">return result</span>
+}
+
+// AllToMaps конвертирует все строки в массив map
+func (qr *QueryResult) AllToMaps() []map[string]interface{} <span class="cov1" title="1">{
+        var results []map[string]interface{}
+        for i := 0; i &lt; len(qr.Rows); i++ </span><span class="cov4" title="2">{
+                results = append(results, qr.RowToMap(i))
+        }</span>
+        <span class="cov1" title="1">return results</span>
+}
+
+// GetValue возвращает значение по индексу строки и колонки
+func (qr *QueryResult) GetValue(rowIndex, colIndex int) interface{} <span class="cov0" title="0">{
+        if rowIndex &lt; 0 || rowIndex &gt;= len(qr.Rows) </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov0" title="0">if colIndex &lt; 0 || colIndex &gt;= len(qr.Rows[rowIndex]) </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov0" title="0">return qr.Rows[rowIndex][colIndex]</span>
+}
+
+// GetColumn возвращает все значения колонки
+func (qr *QueryResult) GetColumn(colIndex int) []interface{} <span class="cov0" title="0">{
+        var column []interface{}
+        for _, row := range qr.Rows </span><span class="cov0" title="0">{
+                if colIndex &lt; len(row) </span><span class="cov0" title="0">{
+                        column = append(column, row[colIndex])
+                }</span>
+        }
+        <span class="cov0" title="0">return column</span>
+}
+
+// GetColumnByName возвращает все значения колонки по имени
+func (qr *QueryResult) GetColumnByName(columnName string) []interface{} <span class="cov0" title="0">{
+        for i, col := range qr.Columns </span><span class="cov0" title="0">{
+                if col == columnName </span><span class="cov0" title="0">{
+                        return qr.GetColumn(i)
+                }</span>
+        }
+        <span class="cov0" title="0">return nil</span>
+}</pre>
+		
+		<pre class="file" id="file4" style="display: none">package core
+
+import "fmt"
+
+// ResultToObjects конвертирует QueryResponse в массив объектов
+func ResultToObjects(response *QueryResponse) ([]map[string]interface{}, error) <span class="cov8" title="1">{
+        if response.Result == nil </span><span class="cov0" title="0">{
+                return []map[string]interface{}{}, nil
+        }</span>
+        <span class="cov8" title="1">return response.Result.AllToMaps(), nil</span>
+}
+
+// FirstRow возвращает первую строку как объект
+func FirstRow(response *QueryResponse) (map[string]interface{}, error) <span class="cov8" title="1">{
+        if response.Result == nil || len(response.Result.Rows) == 0 </span><span class="cov0" title="0">{
+                return nil, nil
+        }</span>
+        <span class="cov8" title="1">return response.Result.RowToMap(0), nil</span>
+}
+
+// FirstValue возвращает значение первой колонки первой строки
+func FirstValue(response *QueryResponse) (interface{}, error) <span class="cov8" title="1">{
+        if response.Result == nil || len(response.Result.Rows) == 0 </span><span class="cov0" title="0">{
+                return nil, nil
+        }</span>
+        <span class="cov8" title="1">if len(response.Result.Rows[0]) == 0 </span><span class="cov0" title="0">{
+                return nil, nil
+        }</span>
+        <span class="cov8" title="1">return response.Result.Rows[0][0], nil</span>
+}
+
+// ValidateResponse проверяет успешность ответа
+func ValidateResponse(response *QueryResponse) error <span class="cov0" title="0">{
+        if !response.Success </span><span class="cov0" title="0">{
+                if response.Error != nil </span><span class="cov0" title="0">{
+                        return fmt.Errorf("[%s] %s", response.Error.Code, response.Error.Message)
+                }</span>
+                <span class="cov0" title="0">return fmt.Errorf("query execution failed")</span>
+        }
+        <span class="cov0" title="0">return nil</span>
+}
+
+// QuickQuery выполняет запрос и возвращает объекты
+func (c *AetherClient) QuickQuery(query string, params []interface{}) ([]map[string]interface{}, error) <span class="cov0" title="0">{
+        response, err := c.ExecuteQuery(query, params, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">if err := ValidateResponse(response); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return ResultToObjects(response)</span>
+}
+
+// QuickValue выполняет запрос и возвращает одно значение
+func (c *AetherClient) QuickValue(query string, params []interface{}) (interface{}, error) <span class="cov0" title="0">{
+        response, err := c.ExecuteQuery(query, params, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">if err := ValidateResponse(response); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return FirstValue(response)</span>
+}</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

@@ -1,0 +1,72 @@
+# AetherQuery_Ecosystem/api_spec/types/common_types.yaml
+HealthResponse:
+  type: object
+  required:
+    - status
+    - timestamp
+  properties:
+    status:
+      type: string
+      enum: [healthy, degraded, unhealthy]
+      example: healthy
+    timestamp:
+      type: string
+      format: date-time
+      example: "2024-01-15T10:30:00Z"
+    version:
+      type: string
+      example: "1.0.0"
+    database:
+      type: string
+      example: "sqlite"
+
+ErrorResponse:
+  type: object
+  required:
+    - error
+    - code
+    - message
+  properties:
+    error:
+      type: string
+      example: "DATABASE_ERROR"
+    code:
+      type: string
+      example: "DB_CONNECTION_FAILED"
+    message:
+      type: string
+      example: "Failed to connect to database"
+    details:
+      type: object
+      additionalProperties: true
+    timestamp:
+      type: string
+      format: date-time
+      example: "2024-01-15T10:30:00Z"
+
+QueryResult:
+  type: object
+  required:
+    - columns
+    - rows
+    - row_count
+  properties:
+    columns:
+      type: array
+      items:
+        type: string
+      example: ["id", "name", "email"]
+    rows:
+      type: array
+      items:
+        type: array
+        items:
+          type: object
+      example: [[1, "John", "john@example.com"], [2, "Jane", "jane@example.com"]]
+    row_count:
+      type: integer
+      example: 2
+    execution_time:
+      type: number
+      format: float
+      example: 0.045
